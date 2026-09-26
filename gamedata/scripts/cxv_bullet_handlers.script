@@ -27,11 +27,16 @@ local last_particle_time
 function napalm(pos, ammo, wpn_id)
 	local napalm_hits = 0
 	
-	wpn_id = wpn_id or db.actor:active_item()
+	if not wpn_id then
+		local wpn = db.actor:active_item()
+		if wpn then
+			wpn_id = wpn:id()
+		end
+	end
+
 	level.iterate_nearest(pos, 5, function(obj)
-		if obj and obj:id() ~= AC_ID and obj:id() ~= 65535 then
+		if obj and obj:id() ~= AC_ID and obj:id() ~= 65535 and (obj.alive and obj:alive()) then
 			if string.find(obj:name(), "legs") then return end	-- First-person legs are being counted
-			if not obj:alive() then return end
 			arti_handlers.burn_npc(obj,11,8)
 			napalm_hits = napalm_hits + 1
 		end

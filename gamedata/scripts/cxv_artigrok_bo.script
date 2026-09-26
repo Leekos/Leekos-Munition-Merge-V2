@@ -426,7 +426,7 @@ function mutant_on_before_hit(monster, shit, bone_id)
 	end
 	
 	-- skip all if not alive
-	if not monster:alive() then return false end
+	if not (monster.alive and monster:alive()) then return false end
 	
 	-- have to put this here since we use this in NPC calculations
 	if shit.power >= 50 then return false end
@@ -500,7 +500,7 @@ function mutant_on_before_hit(monster, shit, bone_id)
 	should_show_normal_numbers = true
 	hit_numbers_critical = false
 	
-	printf("///////////   Mutant Hit registered: ArtiGrok BO  v2.4.2   //////////////////")
+	printf("///////////   Mutant Hit registered: ArtiGrok BO  v2.4.3   //////////////////")
 	printf('%s about to be hit by %s in bone %s', monster and monster:name(), shit and shit.draftsman and shit.draftsman:name(), bone_id)
 
 	if string.match(sec, "knife") or string.match(sec, "axe") or string.match(sec, "desuria") then
@@ -1077,7 +1077,7 @@ function npc_on_before_hit(npc, shit, bone_id)
 	
 -- ////// Now, all of the GAMMA GBO + ArtiGrok stuff //////
 	
-	printf("///////////   Stalker Hit registered: ArtiGrok BO  v2.4.2  //////////////////")
+	printf("///////////   Stalker Hit registered: ArtiGrok BO  v2.4.3  //////////////////")
 	printf('%s about to be hit by %s in bone %s', npc and npc:name(), shit and shit.draftsman and shit.draftsman:name(), bone_id)
 	
 --////////////// DATA PARSING OF HELL - A BONES AND BOOLETS TALE //////////////
@@ -1912,9 +1912,7 @@ function bullet_on_impact(bullet)
     if not bullet or bullet.parent_id ~= 0 then return end
 
     local target = bullet.target_id ~= 65535 and level.object_by_id(bullet.target_id)
-	if target and not target:alive() then 
-		-- do nothing (hopefully prevent log spam?)
-    elseif target then
+	if target and target.alive and target:alive() then
         -- check for existing impact to the target
         local bullet_hit_enemy_list = bullet_store_list[bullet.bullet_id]
         if not bullet_hit_enemy_list then bullet_hit_enemy_list = {} end
@@ -2120,17 +2118,17 @@ function actor_on_update()
 	empty_table(custom_bone_hf)
 	empty_table(custom_bone_dmg)
 	
-	empty_table(arti_handlers.npc_stun)
-	empty_table(arti_handlers.grounded_timer_list)
-	empty_table(arti_handlers.shock_stack_list)
-	empty_table(arti_handlers.burn_stack_list)
-	empty_table(arti_handlers.burn_check_list)
-	empty_table(arti_handlers.acid_stack_list)
-	empty_table(arti_handlers.armorbuster_list)
+--	empty_table(arti_handlers.npc_stun)
+--	empty_table(arti_handlers.grounded_timer_list)
+--	empty_table(arti_handlers.shock_stack_list)
+--	empty_table(arti_handlers.burn_stack_list)
+--	empty_table(arti_handlers.burn_check_list)
+--	empty_table(arti_handlers.acid_stack_list)
+--	empty_table(arti_handlers.armorbuster_list)
 	
-	empty_table(bas_handler.weakened)
+--	empty_table(bas_handler.weakened)
 	
-	printf("///////////   Bone/Effect Tables Reset: ArtiGrok BO  v2.4.2  //////////////////")
+	printf("///////////   Bone/Effect Tables Reset: ArtiGrok BO  v2.4.3  //////////////////")
 	
 end
 

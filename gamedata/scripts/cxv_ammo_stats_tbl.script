@@ -12,6 +12,7 @@ local ini_ammo = ini_file("ammo\\importer.ltx")
 local get_config 		 			= ballistics_mcm.get_config
 local difficulty_scaling_damage 	= get_config("difficulty_scaling_damage") or false
 local difficulty_scaling_ap 		= get_config("difficulty_scaling_ap") or false
+local game_translate = game.translate_string
 
 function inject_stats()
     utils_ui.stats_table["ammo"] = {
@@ -44,9 +45,9 @@ function inject_stats()
 	-- Addons end
 	
 	["special"]={ 
-        index=120, typ= "float",  name= "st_prop_special",       icon_p= "ui_am_condition",              icon_n= "", track= false,  magnitude= 1,      	unit= "",   			compare= false, sign= false, 							show_always=false, value_functor= {"cxv_ammo_stats_tbl","prop_special"} } ,
+        index=120, typ= "string",  name= "st_prop_special",       icon_p= "ui_am_condition",              icon_n= "", track= false,  magnitude= 1,      	unit= "",   			compare= false, sign= false, 							show_always=false, value_functor= {"cxv_ammo_stats_tbl","prop_special"} } ,
     ["special_2"]={ 
-        index=130, typ= "float",  name= "st_prop_extra",         icon_p= "ui_am_condition",           	  icon_n= "", track= false,  magnitude= 1,      unit= "",   			compare= false, sign= false, 							show_always=false, value_functor= {"cxv_ammo_stats_tbl","prop_extra_special"} } ,
+        index=130, typ= "string",  name= "st_prop_extra",         icon_p= "ui_am_condition",           	  icon_n= "", track= false,  magnitude= 1,      unit= "",   			compare= false, sign= false, 							show_always=false, value_functor= {"cxv_ammo_stats_tbl","prop_extra_special"} } ,
    	}
 end
 
@@ -103,12 +104,30 @@ function armor_to_class(val)
 	elseif (val >= 81) then val = 7
 	end
 
-	return game.translate_string("st_prop_armor_"..val)		
+	return game_translate("st_prop_armor_"..val)		
 end
 
 local function armor_to_number(val)
 	val = math.floor(val * 100) or 0
 	return val
+end
+
+function get_special_string(str_spec, sec)
+	if str_spec then
+		if str_spec == "frag" then
+			str_spec = ini_ammo:r_float_ex(sec, str_spec) .. game_translate("st_ballistics_"..str_spec)
+		elseif str_spec == "fire" then
+			str_spec = ini_ammo:r_float_ex(sec, "burn_stacks") .. " " .. game_translate("st_ballistics_"..str_spec)
+		elseif str_spec == "shock" then
+			str_spec = ini_ammo:r_float_ex(sec, "shock_stacks") .. " " .. game_translate("st_ballistics_"..str_spec)
+		elseif str_spec == "flinch" then
+			str_spec = ini_ammo:r_float_ex(sec, str_spec) .. game_translate("st_ballistics_"..str_spec)
+		else
+			str_spec = game_translate("st_ballistics_"..str_spec)
+		end
+	end
+	
+	return str_spec
 end
 
 prepare_stats_table = utils_ui.prepare_stats_table
@@ -136,12 +155,56 @@ function utils_ui.UIInfoItem:GetType(sec)
     else return GetType(self, sec) end
 end
 
+-- ilrathCXV (9/12/26): Messy way to ensure ammo Special effects appear correctly in full item details (not just tooltips)
+GetStatString = utils_ui.get_stats_string_value
+function utils_ui.get_stats_string_value(obj, sec, gr, stat)
+	-- Knife check
+	local get_slot = SYS_GetParam(2, sec, "animation_slot") or 0
+	local is_knife = false
+    if (SYS_GetParam(0, sec, "kind") == "w_melee") and (get_slot ~= 13) then
+		knife_ammo_sec = SYS_GetParam(0, sec, "ammo_class")
+		if knife_ammo_sec then
+			is_knife = true
+		end
+	end
+	
+	local section = is_knife and knife_ammo_sec or sec
+	
+	if not (ini_ammo:section_exist(section) and (stat == "special" or stat == "special_2")) then
+		return GetStatString(obj, sec, gr, stat)
+	end
+	
+	if type(gr) == "string" then
+		gr = stats_table[gr]
+	end
+	if (not gr) then
+		return
+	end
+	
+	local str_spec
+	if stat == "special" then
+		str_spec = ini_ammo:r_string_ex(section, "special")
+	elseif stat == "special_2" then
+		str_spec = ini_ammo:r_string_ex(section, "special_2")
+	end
+	
+	if not str_spec then return GetStatString(obj, sec, gr, stat) end
+	
+	str_spec = get_special_string(str_spec, section)
+	
+	local unit = gr.unit and gr.unit ~= "" and game_translate(gr.unit) or ""
+	local clr = str_spec and GetARGB(255, 170, 170, 170) or GetARGB(255, 200, 50, 50)
+	local sign = ""
+	
+	return ( sign .. str_spec .. " " .. unit ), (clr == GetARGB(255, 200, 50, 50) and true or false)
+end
+
 -- patching sync_finale because these post-update effects should only be applied once
 Sync_Finale = utils_ui.UIInfoItem.Sync_Finale
 function utils_ui.UIInfoItem:Sync_Finale(cond, ele_syncer, ele_resizer, ele_adapter, offset)
     local ret = Sync_Finale(self, cond, ele_syncer, ele_resizer, ele_adapter, offset)
     if not ele_syncer then return ret end
-    -- patch the armor val
+
     local sec = self.section
     local obj = self.id and level.object_by_id(self.id) or nil
 	
@@ -154,11 +217,12 @@ function utils_ui.UIInfoItem:Sync_Finale(cond, ele_syncer, ele_resizer, ele_adap
 		end
 	end
 	
-    if (sec and ini_ammo:section_exist(sec)) or (is_knife and knife_ammo_sec) then
+    local n_sec = is_knife and knife_ammo_sec or sec
+    if (n_sec and ini_ammo:section_exist(n_sec)) then
         for i=1,#self.stats do
-			if self.stats[i].cap:GetText() == game.translate_string("st_prop_k_ap") then
+			if self.stats[i].cap:GetText() == game_translate("st_prop_k_ap") then
                 local str
-                local ap = ini_sys:r_float_ex(is_knife and knife_ammo_sec or sec, "k_ap") or 0						
+                local ap = ini_sys:r_float_ex(n_sec, "k_ap") or 0						
 				ap = ap * 10 * difficulty_mod_ap
                 str = armor_to_class(ap) .. " (" .. armor_to_number(ap) ..")"
                 self.stats[i].txt:SetText(str)
@@ -166,66 +230,41 @@ function utils_ui.UIInfoItem:Sync_Finale(cond, ele_syncer, ele_resizer, ele_adap
 			
 			-- Now to hard-code turning harmful stats to be red text
 			-- Damage (val < 1.0)
-			if self.stats[i].cap:GetText() == game.translate_string("st_prop_k_hit") then
+			if self.stats[i].cap:GetText() == game_translate("st_prop_k_hit") then
 				local str
-				local k_hit = ini_sys:r_float_ex(is_knife and knife_ammo_sec or sec, "k_hit") or 0
+				local k_hit = ini_sys:r_float_ex(n_sec, "k_hit") or 0
 				k_hit = k_hit * difficulty_mod_dmg
 				if k_hit < 1 then
 					self.stats[i].txt:SetTextColor(GetARGB(255, 255, 50, 50))	-- turn the stat red to signify that it is decreasing your damage
 				end
 			end
 			-- Air res/drag (val > 1.0)
-			if self.stats[i].cap:GetText() == game.translate_string("st_cxv_airres") then
+			if self.stats[i].cap:GetText() == game_translate("st_cxv_airres") then
 				local str
-				local k_airres = ini_sys:r_float_ex(is_knife and knife_ammo_sec or sec, "k_air_resistance") or 0
+				local k_airres = ini_sys:r_float_ex(n_sec, "k_air_resistance") or 0
 				if k_airres > 1 then
 					self.stats[i].txt:SetTextColor(GetARGB(255, 255, 50, 50))	-- turn the stat red to signify that it is increasing your drag
 				end
 			end
 			
-			
-            if self.stats[i].cap:GetText() == game.translate_string("st_prop_special") then    
-                local str_spec = ini_ammo:r_string_ex(is_knife and knife_ammo_sec or sec, "special")
+            if self.stats[i].cap:GetText() == game_translate("st_prop_special") then    
+                local str_spec = ini_ammo:r_string_ex(n_sec, "special")
+				str_spec = get_special_string(str_spec, n_sec)
                 if str_spec then
-					if str_spec == "frag" then
-						local frag_str = ini_ammo:r_float_ex(is_knife and knife_ammo_sec or sec, str_spec) .. game.translate_string("st_ballistics_"..str_spec)
-						self.stats[i].txt:SetText(frag_str)
-					elseif str_spec == "fire" then
-						local fire_str = ini_ammo:r_float_ex(is_knife and knife_ammo_sec or sec, "burn_stacks") .. " " .. game.translate_string("st_ballistics_"..str_spec)
-						self.stats[i].txt:SetText(fire_str)
-					elseif str_spec == "shock" then
-						local shock_str = ini_ammo:r_float_ex(is_knife and knife_ammo_sec or sec, "shock_stacks") .. " " .. game.translate_string("st_ballistics_"..str_spec)
-						self.stats[i].txt:SetText(shock_str)	
-					elseif str_spec == "flinch" then
-						local flinch_str = ini_ammo:r_float_ex(is_knife and knife_ammo_sec or sec, str_spec) .. game.translate_string("st_ballistics_"..str_spec)
-						self.stats[i].txt:SetText(flinch_str)
-					else
-						self.stats[i].txt:SetText(game.translate_string("st_ballistics_"..str_spec))
-					end
+					self.stats[i].txt:SetText(str_spec)
                 end
             end
-			if self.stats[i].cap:GetText() == game.translate_string("st_prop_extra") then    
-                local str_spec_2 = ini_ammo:r_string_ex(is_knife and knife_ammo_sec or sec, "special_2")
+			if self.stats[i].cap:GetText() == game_translate("st_prop_extra") then    
+                local str_spec_2 = ini_ammo:r_string_ex(n_sec, "special_2")
+                str_spec_2 = get_special_string(str_spec_2, n_sec)
                 if str_spec_2 then
-					if str_spec_2 == "frag" then
-						local frag_str = ini_ammo:r_float_ex(is_knife and knife_ammo_sec or sec, str_spec_2) .. game.translate_string("st_ballistics_"..str_spec_2)
-						self.stats[i].txt:SetText(frag_str)
-					elseif str_spec_2 == "fire" then
-						local fire_str = ini_ammo:r_float_ex(is_knife and knife_ammo_sec or sec, "burn_stacks") .. " " .. game.translate_string("st_ballistics_"..str_spec_2)
-						self.stats[i].txt:SetText(fire_str)
-					elseif str_spec_2 == "shock" then
-						local shock_str = ini_ammo:r_float_ex(is_knife and knife_ammo_sec or sec, "shock_stacks") .. " " .. game.translate_string("st_ballistics_"..str_spec_2)
-						self.stats[i].txt:SetText(shock_str)
-					elseif str_spec_2 == "flinch" then
-						local flinch_str = ini_ammo:r_float_ex(is_knife and knife_ammo_sec or sec, str_spec_2) .. game.translate_string("st_ballistics_"..str_spec_2)
-						self.stats[i].txt:SetText(flinch_str)
-					else
-						self.stats[i].txt:SetText(game.translate_string("st_ballistics_"..str_spec_2))
-					end
+					self.stats[i].txt:SetText(str_spec_2)
                 end
             end
         end
     end
+
+	return ret
 
 end
 
@@ -245,7 +284,8 @@ end
 
 -- pull from the armor classification
 function prop_ap(obj, sec)
-	return 1
+	local ap = SYS_GetParam(2, obj and obj:section() or sec, "k_ap") or 0						
+	return (math.floor(ap * difficulty_mod_ap * 1000, 0))
 end
 
 function prop_projectiles(obj, sec)
@@ -286,13 +326,22 @@ function prop_wear(obj, sec)
 end
 
 function prop_special(obj, sec)
-    local str_spec = ini_ammo:r_string_ex(sec, "special")
+	local section = obj and obj:section() or sec
+    local str_spec = ini_ammo:r_string_ex(section, "special")
     if str_spec then return 1 else return 0 end
+	
+--	str_spec = get_special_string(str_spec, section)
+--	return (str_spec and str_spec) or 0
+
 end
 
 function prop_extra_special(obj, sec)
+	local section = obj and obj:section() or sec
     local str_spec = ini_ammo:r_string_ex(sec, "special_2")
-    if str_spec then return 1 else return 0 end
+	if str_spec then return 1 else return 0 end
+	
+--	str_spec = get_special_string(str_spec, section)
+--	return (str_spec and str_spec) or 0
 end
 
 -- Momopate's Additions

@@ -204,19 +204,18 @@ end
 local ignition_spread_event_timer = 0.025
 local number_of_npcs_ignition = 0
 local npcs_to_burn = {}
+local ignition_stack_adj = 0.8
 
 -- [Burn Stacking Effect] If a target dies with 20+ burn stacks, they will ignite, spreading their stacks among surrounding targets
 function burn_ignition(npc, wpn_id, stacks)
 	printf("[Arti Handlers] Death ignition firing!!!")
 	npcs_to_burn = {}
-	local stack_amount = stacks
+	local stack_amount = math.ceil(stacks * ignition_stack_adj)
 	local npc_id = npc:id()
 	level.iterate_nearest(npc:position(), 8, function(obj)
 		if obj and obj:id() ~= AC_ID and obj:id() ~= 65535 and obj:id() ~= npc_id and stack_amount > 0 then
 			if string.find(obj:name(), "legs") then return end	-- First-person legs are being counted
-			if not (IsMonster(obj) or IsStalker(obj)) then return end
-			if obj.health <= 0 then return end
-			if not obj:alive() then return end
+			if not (obj.alive and obj:alive()) then return end
 			if obj:has_info("npcx_is_companion") then return end
 			if IsStalker(obj) then
 				if not (are_stalkers_enemies(obj, npc) and are_stalkers_enemies(obj, db.actor)) then return end
@@ -255,7 +254,7 @@ function shock_effect_on_update()
 		for k, v in pairs(shock_stack_list) do
 			if shock_stack_list[k] and shock_stack_list[k] < 20 then
 				local npc = level.object_by_id(k)
-				if npc and npc:alive() then
+				if npc and (npc.alive and npc:alive()) then
 					play_particle(npc, 15, "anomaly2\\effects\\electra_entrance_small")
 				end
 			end
@@ -447,7 +446,7 @@ function burn_npc(npc, bone_id, stack)
 	
 	local npc_id = npc:id()
 	
-	if not npc:alive() then
+	if not (npc.alive and npc:alive()) then
 		burn_stack_list[npc_id] = nil
 		burn_check_list[npc_id] = nil
 		return true
@@ -486,7 +485,7 @@ function shock_npc(npc, bone_id, wpn_id, stack)
 	
 	npc_id = npc:id()
 	
-	if not npc:alive() then
+	if not (npc.alive and npc:alive()) then
 		shock_stack_list[npc_id] = nil
 		grounded_timer_list[npc_id] = nil
 		return true
@@ -518,11 +517,10 @@ end
 -- for corrosive ammo
 function acid_damage(npc, bone_id)
 	
-	if not npc:alive() then return end
+	if not (npc.alive and npc:alive()) then return end
 	
     play_particle(npc, bone_id, "artefact\\effects\\af_acidic_idle_color")
     play_sound_on_location("acid", npc)
-	
 	
 	acid_stack_list[npc:id()] = (acid_stack_list[npc:id()] and acid_stack_list[npc:id()] + 1) or 1
 	
@@ -532,9 +530,7 @@ function acid_damage(npc, bone_id)
 		level.iterate_nearest(npc:position(), 8, function(obj)
             if obj and obj:id() ~= AC_ID and obj:id() ~= 65535 then
 				if string.find(obj:name(), "legs") then return end	-- Avoid First-person legs from being checked (remove error spam)
-				if not (IsMonster(obj) or IsStalker(obj)) then return end
-				if obj.health <= 0 then return end
-				if not obj:alive() then return end
+				if not (obj.alive and obj:alive()) then return end
 				if IsStalker(obj) then
 					if not (are_stalkers_enemies(obj, npc) and are_stalkers_enemies(obj, db.actor)) then return end
 				end
@@ -621,19 +617,12 @@ function lightning_damage(npc, bone_id, wpn_id, armor_amount)
         level.iterate_nearest(npc:position(), radius, function(obj)
             if obj and obj:id() ~= AC_ID and obj:id() ~= 65535 then
 				if string.find(obj:name(), "legs") then return end	-- First-person legs are being counted
-				if not (IsMonster(obj) or IsStalker(obj)) then return end
-				if obj.health <= 0 then return end
-				if not obj:alive() then return end
+				if not (obj.alive and obj:alive()) then return end
 				if obj:has_info("npcx_is_companion") then return end
 				
 				if IsStalker(obj) then
 					if not (are_stalkers_enemies(obj, npc) and are_stalkers_enemies(obj, db.actor)) then return end
 				end
-				
-				if string.find(obj:name(), "legs") then return end	-- First-person legs are being counted
-				if obj.health <= 0 then return end
-				if not obj:alive() then return end
-				if obj:has_info("npcx_is_companion") then return end
 					
 				printf("Hitting enemy: %s", obj:name())
 				
@@ -678,9 +667,7 @@ function graze_handler(npc, new_hit, radius)	-- new_hit = new s_hit (handled in 
 	level.iterate_nearest(npc:position(), radius, function(obj)
 		if obj and obj:id() ~= AC_ID and obj:id() ~= 65535 and obj:id() ~= npc:id() then
 			if string.find(obj:name(), "legs") then return end	-- First-person legs are being counted
-			if not (IsMonster(obj) or IsStalker(obj)) then return end
-			if obj.health <= 0 then return end
-			if not obj:alive() then return end
+			if not (obj.alive and obj:alive()) then return end
 			if obj:has_info("npcx_is_companion") then return end
 			if IsStalker(obj) then
 				if not (are_stalkers_enemies(obj, npc) and are_stalkers_enemies(obj, db.actor)) then return end

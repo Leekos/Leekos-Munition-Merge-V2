@@ -51,8 +51,8 @@ end
 local fire_particle, fire_particle2
 
 local burn_min = 18
-local burn_max = 60
-local burn_radius = 25
+local burn_max = 40
+local burn_radius = 15
 
 function ignite(position, ammo, wpn_id)
 
@@ -63,7 +63,7 @@ function ignite(position, ammo, wpn_id)
     fire_particle:play_at_pos(position)
     fire_particle2:play_at_pos(position)
     level.iterate_nearest(position, burn_radius, function(obj)
-        if obj and obj:id() ~= AC_ID and obj:alive() then
+        if obj and obj:id() ~= AC_ID and obj.alive and obj:alive() then
 			if string.find(obj:name(), "legs") then return end	-- Avoid first-person legs
             arti_handlers.burn_npc(obj, 11, math_random(burn_min, burn_max))
         end
