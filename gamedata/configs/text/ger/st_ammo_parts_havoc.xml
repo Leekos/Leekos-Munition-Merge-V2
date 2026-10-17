@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="windows-1251"?>
+	<string_table>
+		<string id="st_casings_p">
+			<text>Patronenhьlsen - Kleinkaliber</text>
+		</string>
+		<string id="st_casings_p_desc">
+			<text>Kleine Messinghьlsen mit Zьndhьtchen, die zur Herstellung von Kleinkalibermunition verwendet werden. Diese Patronen kцnnen in jede GrцЯe von 7,62x25 bis zu .357 Magnum umgearbeitet werden.</text>
+		</string>
+		<string id="st_casings_s">
+			<text>Patronenhьlsen - Schrotkaliber</text>
+		</string>
+		<string id="st_casings_s_desc">
+			<text>Kunststoffhьlsen mit Messingzьndhьtchen, die zur Herstellung von Schrotmunition verwendet werden.</text>
+		</string>
+		<string id="st_casings_r5">
+			<text>Patronenhьlsen - Mittelkaliber</text>
+		</string>
+		<string id="st_casings_r5_desc">
+			<text>MittelgroЯe Messinghьlsen mit Zьndhьtchen, die zur Herstellung von Mittelkalibermunition verwendet werden. Diese Patronen kцnnen in die GrцЯe 39mm oder 45mm umgearbeitet werden.</text>
+		</string>
+		<string id="st_casings_r7">
+			<text>Patronenhьlsen - GroЯkaliber</text>
+		</string>
+		<string id="st_casings_r7_desc">
+			<text>GroЯe Messinghьlsen mit Zьndhьtchen, die zur Herstellung von GroЯkalibermunition verwendet werden. Diese Patronen kцnnen in jede GrцЯe von 51mm bis zu .50BMG umgearbeitet werden.</text>
+		</string>
+		<string id="st_powder_p">
+			<text>SchieЯpulver - Kleinkaliber</text>
+		</string>
+		<string id="st_powder_p_desc">
+			<text>Schnell brennendes, zweibasiges Treibladungspulver zur Verwendung in Handfeuerpatronen. Diese Variante des rauchlosen Pulvers erzeugt weniger Gesamtenergie als langsamer arbeitende Pulver, verbrennt aber sauberer.</text>
+		</string>
+		<string id="st_powder_s">
+			<text>SchieЯpulver - Schrotkaliber</text>
+		</string>
+		<string id="st_powder_s_desc">
+			<text>Schnell brennendes, zweibasiges Treibladungspulver zur Verwendung in Schrotpatronen. Diese Variante des rauchlosen Pulvers erzeugt weniger Gesamtenergie als langsamer arbeitende Pulver, verbrennt aber sauberer und schneller.</text>
+		</string>
+		<string id="st_powder_r5">
+			<text>SchieЯpulver - Mittelkaliber</text>
+		</string>
+		<string id="st_powder_r5_desc">
+			<text>IMR-Treibmittel fьr leichte Mittelkaliberpatronen und einige schwere Kleinkaliberpatronen. Dieses Pulver brennt mit mittlerer Geschwindigkeit und erzeugt eine gute Energiemenge.</text>
+		</string>
+		<string id="st_powder_r7">
+			<text>SchieЯpulver - GroЯkaliber</text>
+		</string>
+		<string id="st_powder_r7_desc">
+			<text>Hochergiebiges, langsam brennendes Munitionspulver fьr GroЯkaliberpatronen. Dieses Pulver liefert die meiste Energie und brennt am langsamsten, daher ist es nur fьr groЯkalibrige Munition fьr Langwaffen geeignet.</text>
+		</string>
+		<string id="st_rounds_p">
+			<text>Kleinkaliberkugeln</text>
+		</string>
+		<string id="st_handgun_rounds_p_desc">
+			<text>Handfeuerwaffenpatronen unterschiedlicher GrцЯe, die aus Munition demontiert wurden. Diese werden bei der Herstellung neuer Munition nьtzlich sein.</text>
+		</string>
+		<string id="st_rounds_p_ap">
+			<text>Kleinkaliberkugeln - Panzerbrechend</text>
+		</string>
+		<string id="st_rounds_p_ap_desc">
+			<text>Aus Munition geborgene Handfeuerwaffengeschosse unterschiedlicher GrцЯe. Diese haben in das Geschoss eingebettete Legierungspenetratoren. Handfeuerwaffengeschosse sind in der Regel zu langsam, um Panzerungen zu durchdringen, selbst mit Penetratoren, es sei denn, es wird eine Ьberdruck-Pulverladung verwendet oder das Geschoss ist speziell fьr die Durchdringung von Panzerungen konzipiert, wie z. B. das 5,7x28-Geschoss.</text>
+		</string>
+		<string id="st_rounds_s">
+			<text>Schrotkaliberkugeln</text>
+		</string>
+		<string id="st_rounds_s_desc">
+			<text>Kleine Bleikugeln, die in Jagdflinten verwendet werden. Diese kцnnen auch eingeschmolzen und zu groЯen Kugeln gegossen werden.</text>
+		</string>
+		<string id="st_rounds_s_ap">
+			<text>Schrotkaliberkugeln - Panzerbrechend</text>
+		</string>
+		<string id="st_rounds_s_ap_desc">
+			<text>Gehдrteter Stahlpfeil, der von einem Treibspiegel umgeben ist. Diese Geschosse werden aus Schrotflinten der Polizei abgefeuert, um Motorblцcke auszuschalten, haben aber auch eine gute Wirkung auf Kцrperpanzer.</text>
+		</string>
+		<string id="st_rounds_r5">
+			<text>Mittelkaliberkugeln</text>
+		</string>
+		<string id="st_rounds_r5_desc">
+			<text>Unterschiedlich groЯe Kugeln fьr Mittelkalibergewehre, die in Sturmgewehren verwendet werden. Militдrisch hergestellt und mit einem Vollmetallmantel ummantelt, optimiert fьr Prдzision.</text>
+		</string>
+		<string id="st_rounds_r5_ap">
+			<text>Mittelkaliberkugeln - Panzerbrechend</text>
+		</string>
+		<string id="st_rounds_r5_ap_desc">
+			<text>Unterschiedlich groЯe Kugeln fьr Mittelkalibergewehre mit Legierungspenetratoren, die in Sturmgewehren verwendet werden. Es handelt sich um Spezialgeschosse, die Panzerungen auf Standard-Entfernungen zerstцren kцnnen, allerdings auf Kosten der Wirksamkeit gegen menschliche Kцrperteile.</text>
+		</string>
+		<string id="st_rounds_r7">
+			<text>GroЯkaliberkugeln</text>
+		</string>
+		<string id="st_rounds_r7_desc">
+			<text>Gewehrgeschosse in voller GrцЯe, die mit einem Metallmantel umhьllt sind. Sie werden ьblicherweise zum Laden von Patronen fьr die Jagd und fьr militдrische Scharfschьtzen verwendet.</text>
+		</string>
+		<string id="st_rounds_r7_ap">
+			<text>GroЯkaliberkugeln - Panzerbrechend</text>
+		</string>
+		<string id="st_rounds_r7_ap_desc">
+			<text>GroЯkalibrige Gewehrkugeln mit eingebetteten Legierungspenetratoren. Diese Patronen werden von Militдr und Spezialkrдften verwendet, um Panzerungen aus groЯer Entfernung zu durchschlagen.</text>
+		</string>
+	</string_table>

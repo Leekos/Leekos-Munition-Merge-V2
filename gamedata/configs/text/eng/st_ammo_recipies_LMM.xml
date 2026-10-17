@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="windows-1251"?>
+	<string_table>
+    <string id="st_recipe_ammo_arti1">
+      <text>Applications of Artifacts on Small Arms, Rev. 3</text>
+    </string>
+    <string id="st_recipe_ammo_arti1_descr">
+      <text>Research paper produced by the Ministry of Science with the help of various stalker groups. Over twenty different experiment types are listed, most of which ended in failures of varyingly catastrophic levels.</text>
+    </string>
+
+  <string id="st_recipe_ammo_arti2">
+    <text>Applications of Artifacts on Hunting Arms, Rev. 3</text>
+  </string>
+  <string id="st_recipe_ammo_arti2_descr">
+    <text>Research paper produced by the Ministry of Science with the help of various stalker groups. Over twenty different experiment types are listed, most of which ended in failures of varyingly catastrophic levels.</text>
+  </string>
+    <string id="st_recipe_ammo_arti3">
+      <text>Applications of Artifacts on Assault Arms, Rev. 3</text>
+    </string>
+    <string id="st_recipe_ammo_arti3_descr">
+      <text>Research paper produced by the Ministry of Science with the help of various stalker groups. Over twenty different experiment types are listed, most of which ended in failures of varyingly catastrophic levels.</text>
+    </string>
+    <string id="st_recipe_ammo_arti4">
+      <text>REDACTED</text>
+    </string>
+    <string id="st_recipe_ammo_arti4_descr">
+      <text>REDACTED</text>
+    </string>
+</string_table>

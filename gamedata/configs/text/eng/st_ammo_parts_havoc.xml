@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="windows-1251"?>
+	<string_table>
+		<string id="st_casings_p">
+			<text>Cartridge casings - Small caliber</text>
+		</string>
+		<string id="st_casings_p_desc">
+			<text>Small brass cases with primers used to make small caliber ammunition. These cartridges can be converted into any size from 7.62x25 up to .357 Magnum.</text>
+		</string>
+		<string id="st_casings_s">
+			<text>Cartridge casings - Shot caliber</text>
+		</string>
+		<string id="st_casings_s_desc">
+			<text>Plastic cases with brass primers used to make shotgun ammunition.</text>
+		</string>
+		<string id="st_casings_r5">
+			<text>Cartridge casings - Medium caliber</text>
+		</string>
+		<string id="st_casings_r5_desc">
+			<text>Medium-sized brass cases with primers used to make medium caliber ammunition. These cartridges can be converted into 39mm or 45mm sizes.</text>
+		</string>
+		<string id="st_casings_r7">
+			<text>Cartridge casings - Large caliber</text>
+		</string>
+		<string id="st_casings_r7_desc">
+			<text>Large brass cases with primers used to make large caliber ammunition. These cartridges can be converted into any size from 51mm up to .50BMG.</text>
+		</string>
+		<string id="st_powder_p">
+			<text>Gunpowder - Small caliber</text>
+		</string>
+		<string id="st_powder_p_desc">
+			<text>Fast-burning, two-base propellant powder for use in handgun cartridges. This variant of smokeless powder produces less total energy than slower working powders, but burns cleaner.</text>
+		</string>
+		<string id="st_powder_s">
+			<text>Gunpowder - Shot caliber</text>
+		</string>
+		<string id="st_powder_s_desc">
+			<text>Fast-burning, two-base propellant powder for use in shotshells. This variant of smokeless powder produces less total energy than slower working powders, but burns cleaner and faster.</text>
+		</string>
+		<string id="st_powder_r5">
+			<text>Gunpowder - Medium caliber</text>
+		</string>
+		<string id="st_powder_r5_desc">
+			<text>IMR propellant for light medium caliber cartridges and some heavy small caliber cartridges. This powder burns at a medium speed and produces a good amount of energy.</text>
+		</string>
+		<string id="st_powder_r7">
+			<text>Gunpowder - Large caliber</text>
+		</string>
+		<string id="st_powder_r7_desc">
+			<text>High-yield, slow-burning ammunition powder for large-caliber cartridges. This powder provides the most energy and burns the slowest, so it is only suitable for large-caliber long gun ammunition.</text>
+		</string>
+		<string id="st_rounds_p">
+			<text>Small caliber bullets</text>
+		</string>
+		<string id="st_handgun_rounds_p_desc">
+			<text>Handgun cartridges of various sizes dismantled from ammunition. These will be useful in crafting new ammunition.</text>
+		</string>
+		<string id="st_rounds_p_ap">
+			<text>Small caliber bullets - AP</text>
+		</string>
+		<string id="st_rounds_p_ap_desc">
+			<text>Handgun bullets of various sizes recovered from ammunition. These have alloy penetrators embedded in the bullet. Small arms rounds are typically too slow to penetrate armor, even with penetrators, unless a positive pressure powder charge is used or the round is specifically designed to penetrate armor, such as: B. the 5.7x28 bullet.</text>
+		</string>
+		<string id="st_rounds_s">
+			<text>Shotgun caliber bullets</text>
+		</string>
+		<string id="st_rounds_s_desc">
+			<text>Small lead pellets used in hunting shotguns. These can also be melted down and cast into large bullets.</text>
+		</string>
+		<string id="st_rounds_s_ap">
+			<text>Shotgun caliber bullets - AP</text>
+		</string>
+		<string id="st_rounds_s_ap_desc">
+			<text>Hardened steel arrow surrounded by a sabot. These rounds are fired from police shotguns to disable engine blocks, but also have a good effect on body armor.</text>
+		</string>
+		<string id="st_rounds_r5">
+			<text>Medium caliber bullets</text>
+		</string>
+		<string id="st_rounds_r5_desc">
+			<text>Different sized bullets for medium caliber rifles used in assault rifles. Military manufactured and encased in a full metal jacket optimized for precision.</text>
+		</string>
+		<string id="st_rounds_r5_ap">
+			<text>Medium caliber bullets - AP</text>
+		</string>
+		<string id="st_rounds_r5_ap_desc">
+			<text>Different sized bullets for medium caliber rifles with alloy penetrators used in assault rifles. These are special rounds that can destroy armor at standard distances, but at the expense of effectiveness against human body parts.</text>
+		</string>
+		<string id="st_rounds_r7">
+			<text>Large caliber bullets</text>
+		</string>
+		<string id="st_rounds_r7_desc">
+			<text>Full size rifle bullets covered in a metal jacket. They are commonly used to load cartridges for hunting and military snipers.</text>
+		</string>
+		<string id="st_rounds_r7_ap">
+			<text>Large caliber bullets - AP</text>
+		</string>
+		<string id="st_rounds_r7_ap_desc">
+			<text>Large caliber rifle bullets with embedded alloy penetrators. These cartridges are used by military and special forces to penetrate armor from long distances.</text>
+		</string>
+	</string_table>
