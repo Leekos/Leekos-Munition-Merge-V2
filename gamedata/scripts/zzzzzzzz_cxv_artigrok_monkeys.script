@@ -119,3 +119,41 @@ if hit_numbers then
 	
 	
 end
+
+--------------------------------------------------------------------------------------------
+-- TruE/Seven Thunders patch
+-- patch to allow TruE "special effect" will be inside cxv_artigrok_bo
+-- patch for Seven "special effect" added to edited version of the script included with ArtiGrok
+--------------------------------------------------------------------------------------------
+if arksek_headshot_thing or arksek_funny_gun then
+	
+	if arksek_headshot_thing and cxv_artigrok_bo.modded_ap_effects then
+		
+		local head_bones = {
+			[14] =	"bip01_neck", 
+			[15] =	"bip01_head",
+			[16] =	"eye_left",
+			[17] =	"eye_right",
+			[18] =	"eyelid_1",
+			[19] =	"jaw_1",
+		}
+		
+		local ap_effects = cxv_artigrok_bo.modded_ap_effects
+		function cxv_artigrok_bo.modded_ap_effects(k_ap, wpn_parent_sec, bone_id)
+			
+			if head_bones[bone_id] and (wpn_parent_sec == (arksek_headshot_thing.arksek_gun_parent_section or "wpn_true")) then
+				k_ap = (k_ap < 1.0 and 1.0) or k_ap
+			end
+			
+			return ap_effects(k_ap)
+		end
+	end
+	
+end
+
+--------------------------------------------------------------------------------------------
+-- Master crash fix: Always "nil"/nullify any script trying to re-assign/patch GBO's NPC hit function
+--------------------------------------------------------------------------------------------
+if grok_bo and grok_bo.npc_on_before_hit then
+	grok_bo.npc_on_before_hit = nil
+end

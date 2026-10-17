@@ -1,0 +1,268 @@
+-- verdatim.
+-- only works for gamma
+-- ilrathCXV (10/17/26): Edited to allow compat. and functionality for ArtiGrok for "The Seven Thunders of Retribution" weapon mod
+						-- This script should not crash if you do not use the weapon mod
+
+-- change with the gun's parent section
+weapon_section = "wpn_setsuna"
+
+-- all time units are seconds unless stated otherwise
+-- how fast the gun recharges one bullet. also how fast it recharges upon a lethal headshot
+normal_repeat_timing = 2
+fast_repeat_timing = 0.5
+
+-- how long the lethal headshot boost lasts
+fast_repeat_duration = 5
+
+-- update timer, basically defines how long it takes for the script to update and notice the gun is the weapon_section, probably shouldnt play around with this too much
+update_time = 1
+
+local repeat_delay = normal_repeat_timing
+
+function on_game_start()
+	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
+end
+
+function actor_on_first_update()
+	CreateTimeEvent("arksek_funny_gun", "repeating_loop", 0, check_for_new_guns)
+end
+
+--[[
+CWeapon methods
+GetAmmoElapsed
+GetAmmoMagSize
+SetAmmoElapsed
+]]
+
+headshot_start_time = {}
+
+repeat_delays_table = {}
+
+fast_repeat_duration_table = {}
+
+time_at_end_table = {}
+
+headshot_counter = {}
+
+function check_for_new_guns()
+	local function iterator(_, itm)
+		if not itm then return end
+		if not itm:is_weapon() then return end
+		local parent_section = ini_sys:r_string_ex(itm:section(), "parent_section") or itm:section()
+		if parent_section ~= weapon_section then return end
+		local id = itm:id()
+		if repeat_delays_table["repeat_delay"..id] then
+			return
+		end
+		repeat_delays_table["repeat_delay"..id] = repeat_delay
+		CreateTimeEvent("arksek_funny_gun", "repeat_loop_for_" .. id, repeat_delays_table["repeat_delay"..id], replenish_ammo_loop, id)
+	end
+	db.actor:iterate_inventory(iterator, db.actor)
+	ResetTimeEvent("arksek_funny_gun", "repeating_loop", update_time)
+end
+
+
+function replenish_ammo_loop(id)
+	--printf("id is %s", id)
+	if not id then return true end
+	local delay = repeat_delays_table["repeat_delay"..id]
+	local wpn = get_object_by_id(id)
+	local in_inventory = false
+	db.actor:iterate_inventory(function(_,itm)
+		if not itm then return end
+		if itm:id() == id then
+			in_inventory = true
+			return true
+		end
+	end
+	, db.actor)
+	if not in_inventory then
+		repeat_delays_table["repeat_delay"..id] = nil
+		printf("item id %s not in invetory, unregistering", id)
+		return true
+	end
+	if not wpn then 
+		ResetTimeEvent("arksek_funny_gun", "repeat_loop_for_"..id, update_time)
+		--printf("not wpn")
+		return 
+	end
+	local parent_section = ini_sys:r_string_ex(wpn:section(), "parent_section") or wpn:section()
+	if parent_section ~= weapon_section then 
+		ResetTimeEvent("arksek_funny_gun", "repeat_loop_for_"..id, update_time)
+		--printf("not the right section")
+		return 
+	end
+	local wpn_cast = wpn:cast_Weapon()
+	local ammo_count = wpn_cast:GetAmmoElapsed()
+	-- if ammo_count is max...
+	if ammo_count == wpn_cast:GetAmmoMagSize() then 
+		ResetTimeEvent("arksek_funny_gun", "repeat_loop_for_"..id, update_time)
+		--printf("full ammo for id %s", id)
+		return 
+	end
+	if wpn:get_state() == 5 then
+		ResetTimeEvent("arksek_funny_gun", "repeat_loop_for_"..id, update_time)
+		local tg = time_global()
+		local time_until_end = (time_at_end_table[id] or 0) - tg/1000
+		if time_until_end and time_until_end > 0 then
+			-- add extra time since this cycle is skipped
+			time_until_end = time_until_end + update_time
+			time_at_end_table[id] = time_at_end_table[id] + update_time
+			printf("time until headshot boost ends is %s", time_until_end)
+			ResetTimeEvent("arksek_funny_gun", "reset_to_lower_repeat_delay"..id, time_until_end)
+		end
+		--printf("gun id %s is shooting", id)
+		return 
+	end
+	ammo_count = ammo_count + 1
+	wpn_cast:SetAmmoElapsed(ammo_count)
+	--printf("increasing ammo for id %s", id)
+	-- reset the funny loop with the delay as set
+	ResetTimeEvent("arksek_funny_gun", "repeat_loop_for_"..id, delay)
+end
+	
+	
+--[[
+-- deprecated to allow replenishing while gun is in invetory
+function gun_loop()
+	local wpn = db.actor:active_item()
+	if not wpn then 
+		ResetTimeEvent("arksek_funny_gun", "repeating_loop", update_time)
+		printf("not wpn")
+		return 
+	end
+	local parent_section = ini_sys:r_string_ex(wpn:section(), "parent_section") or wpn:section()
+	if parent_section ~= weapon_section then 
+		ResetTimeEvent("arksek_funny_gun", "repeating_loop", update_time)
+		printf("not the right section")
+		return 
+	end
+	local wpn_cast = wpn:cast_Weapon()
+	local ammo_count = wpn_cast:GetAmmoElapsed()
+	-- if ammo_count is max...
+	if ammo_count == wpn_cast:GetAmmoMagSize() then 
+		ResetTimeEvent("arksek_funny_gun", "repeating_loop", update_time)
+		printf("full ammo")
+		return 
+	end
+	ammo_count = ammo_count + 1
+	wpn_cast:SetAmmoElapsed(ammo_count)
+	printf("increasing ammo")
+	-- reset the funny loop with the delay as set
+	ResetTimeEvent("arksek_funny_gun", "repeating_loop", repeat_delay)
+end
+]]
+
+
+
+if not cxv_artigrok_bo and grok_bo then
+
+	original_grok_bo_npc = grok_bo.npc_on_before_hit
+	
+	-- borrowed from grok_bo for detection of npc death because it handles everything
+	
+	grok_bo.npc_on_before_hit = function(npc, shit, bone_id)
+		original_grok_bo_npc(npc, shit, bone_id)
+		-- if the shot is not by actor...
+		if shit.draftsman:id() ~= db.actor:id() then
+			return
+		end
+		-- if the shot is not a headshot...
+		if not (tonumber(bone_id) >= 14 and tonumber(bone_id) <= 19) then
+			return
+		end
+		-- if the shot isnt from the energy gun
+		-- if the npc is dead...
+		if npc.health <= 0 then
+			local wpn = db.actor:active_item()
+			if not wpn then return end
+			local parent_section = ini_sys:r_string_ex(wpn:section(), "parent_section") or wpn:section()
+			if parent_section ~= weapon_section then return end
+			local id = wpn:id()
+			repeat_delays_table["repeat_delay"..id] = fast_repeat_timing
+			--repeat_delay = fast_repeat_timing
+			ResetTimeEvent("arksek_funny_gun", "repeat_loop_for_"..id, repeat_delays_table["repeat_delay"..id])
+			RemoveTimeEvent("arksek_funny_gun", "reset_to_lower_repeat_delay"..id)
+			local tg = time_global()
+			if not headshot_start_time[id] then
+				headshot_start_time[id] = tg
+				time_at_end_table[id] = (headshot_start_time[id]/1000) + fast_repeat_duration
+				headshot_counter[id] = 1
+			else
+				headshot_counter[id] = headshot_counter[id] + 1
+				local time_since_headshot = tg - headshot_start_time[id]
+				time_at_end_table[id] = (tg/1000) + (fast_repeat_duration*headshot_counter[id]) - (time_since_headshot/1000)
+				printf("%s,%s,%s,%s", tg, headshot_start_time[id], time_since_headshot, fast_repeat_duration)
+				-- 4956060,4951118,4942,5
+			end
+			fast_repeat_duration_table[id] = (time_at_end_table[id] - (tg/1000)) > 0 and (time_at_end_table[id] - (tg/1000)) or fast_repeat_duration
+	
+			printf("changing repeat delay to %s", fast_repeat_duration_table[id])
+			-- reset the timing back to normal after a 'fast_repeat_duration' amount of time
+			CreateTimeEvent("arksek_funny_gun", "reset_to_lower_repeat_delay" .. id, fast_repeat_duration_table[id], function(id)
+				repeat_delays_table["repeat_delay"..id] = normal_repeat_timing
+				fast_repeat_duration_table[id] = nil
+				headshot_start_time[id] = nil
+				time_at_end_table[id] = nil
+				headshot_counter[id] = nil
+				return true
+			end,id)
+		end
+	end
+elseif cxv_artigrok_bo then
+	artigrok_bo_npc = cxv_artigrok_bo.npc_on_before_hit
+	
+	cxv_artigrok_bo.npc_on_before_hit = function(npc, shit, bone_id)
+		local hit_data = artigrok_bo_npc(npc, shit, bone_id)
+		-- if the shot is not by actor...
+		
+		if hit_data then
+		
+			if shit.draftsman:id() ~= AC_ID then
+				return hit_data
+			end
+			-- if the shot is not a headshot...
+			if not (tonumber(bone_id) >= 14 and tonumber(bone_id) <= 19) then
+				return hit_data
+			end
+			-- if the shot isnt from the energy gun
+			-- if the npc is dead...
+			if ((npc.health - hit_data.shit.power) <= 0) or (hit_data.surrender_bonus == 1 and (hit_data.shit.power < npc.health)) then
+				local wpn = db.actor:active_item()
+				if not wpn then return end
+				local parent_section = ini_sys:r_string_ex(wpn:section(), "parent_section") or wpn:section()
+				if parent_section ~= weapon_section then return end
+				local id = wpn:id()
+				repeat_delays_table["repeat_delay"..id] = fast_repeat_timing
+				--repeat_delay = fast_repeat_timing
+				ResetTimeEvent("arksek_funny_gun", "repeat_loop_for_"..id, repeat_delays_table["repeat_delay"..id])
+				RemoveTimeEvent("arksek_funny_gun", "reset_to_lower_repeat_delay"..id)
+				local tg = time_global()
+				if not headshot_start_time[id] then
+					headshot_start_time[id] = tg
+					time_at_end_table[id] = (headshot_start_time[id]/1000) + fast_repeat_duration
+					headshot_counter[id] = 1
+				else
+					headshot_counter[id] = headshot_counter[id] + 1
+					local time_since_headshot = tg - headshot_start_time[id]
+					time_at_end_table[id] = (tg/1000) + (fast_repeat_duration*headshot_counter[id]) - (time_since_headshot/1000)
+					printf("%s,%s,%s,%s", tg, headshot_start_time[id], time_since_headshot, fast_repeat_duration)
+					-- 4956060,4951118,4942,5
+				end
+				fast_repeat_duration_table[id] = (time_at_end_table[id] - (tg/1000)) > 0 and (time_at_end_table[id] - (tg/1000)) or fast_repeat_duration
+		
+				printf("changing repeat delay to %s", fast_repeat_duration_table[id])
+				-- reset the timing back to normal after a 'fast_repeat_duration' amount of time
+				CreateTimeEvent("arksek_funny_gun", "reset_to_lower_repeat_delay" .. id, fast_repeat_duration_table[id], function(id)
+					repeat_delays_table["repeat_delay"..id] = normal_repeat_timing
+					fast_repeat_duration_table[id] = nil
+					headshot_start_time[id] = nil
+					time_at_end_table[id] = nil
+					headshot_counter[id] = nil
+					return true
+				end,id)
+			end
+			
+		end
+	end
+end
